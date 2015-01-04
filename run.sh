@@ -1,1 +1,1 @@
-out/legend_of_z
+bin/legend_of_z
