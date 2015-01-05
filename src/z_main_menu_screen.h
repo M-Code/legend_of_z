@@ -3,6 +3,6 @@
 
 
 class Z_MainMenuScreen : Z_Screen {
-}
+};
 
 #endif

@@ -21,6 +21,7 @@ All Legend of Z class names have a "Z_" prefix.
 
 /* Global Variables */
 bool running;
+SDL_Window*      mainWindow;
 Z_ScreenManager* screenManager;
 
 Z_SDLTextureLoader* texLoader;
@@ -34,7 +35,7 @@ SDL_Surface* backgroundSurface = NULL;
 void Z_Init(void);
 void Z_Destroy(void);
 void Z_UpdateGame(void);
-void Z_RenderScreen(void);
+void Z_Render(void);
 /* End of Function Prototypes */
 
 // Initialize Legend of Z.
@@ -42,7 +43,7 @@ void Z_Init(void) {
     SDL_Init(SDL_INIT_EVERYTHING);
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Creating main window..");
 
-    SDL_Window* mainWindow = SDL_CreateWindow("Legend of Z", 
+    mainWindow = SDL_CreateWindow("Legend of Z", 
                                                 SDL_WINDOWPOS_CENTERED,
                                                 SDL_WINDOWPOS_CENTERED, 
                                                 640, 480, 
@@ -68,12 +69,13 @@ void Z_UpdateGame(void) {
 
 }
 
-void Z_RenderScreen(void) {
-    screenManager->GetCurrentScreen()->RenderScreen(renderer);
+void Z_Render(void) {
+    screenManager->GetCurrentScreen()->Render(renderer);
     SDL_RenderPresent(renderer);
 }
 
 int main(void) {
+    try {
     Z_Init();
     SDL_Event event;
     while (running) {
@@ -92,9 +94,11 @@ int main(void) {
         }
 
         Z_UpdateGame();
-        Z_RenderScreen();
+        Z_Render();
     }
-
+    } catch (...) {
+        SDL_Log("Blew up!");
+    }
     Z_Destroy();   
     return 0;
 }

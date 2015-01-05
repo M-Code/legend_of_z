@@ -1,5 +1,4 @@
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-echo $DIR
 
 mkdir -p "$DIR/bin" 
 if [ `uname` == "Linux" ]; then

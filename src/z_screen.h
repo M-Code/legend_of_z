@@ -8,8 +8,8 @@ class Z_Screen {
     private:
         //Z_ScreenManager* screenManager;
     public:
-        Z_Screen(Z_ScreenManager* screenManager);
-        virtual void RenderScreen(SDL_Renderer* renderer);
+        Z_Screen(void);
+        virtual void Render(SDL_Renderer* renderer);
 };
 
 #endif
