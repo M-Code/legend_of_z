@@ -6,6 +6,7 @@
 class Z_ScreenManager {
     private:
         Z_Screen* currentScreen;
+
         Z_Screen* mainMenuScreen;
         Z_Screen* loadGameScreen;
         Z_Screen* saveGameScreen;
