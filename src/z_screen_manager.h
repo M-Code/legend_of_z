@@ -1,6 +1,7 @@
 #ifndef Z_SCREEN_MANAGER_H
 #define Z_SCREEN_MANAGER_H
 
+#include "SDL2/SDL.h"
 #include "z_screen.h"
 
 class Z_ScreenManager {
@@ -14,7 +15,7 @@ class Z_ScreenManager {
         Z_Screen* gameScreen;
         
     public:
-        Z_ScreenManager(void);
+        Z_ScreenManager(SDL_Renderer* renderer);
         Z_Screen* GetCurrentScreen(void);
         void SetCurrentScreen(void);
 };

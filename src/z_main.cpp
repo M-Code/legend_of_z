@@ -54,7 +54,7 @@ void Z_Init(void) {
     running = true;
     texLoader = new Z_TextureLoader();
         
-    screenManager = new Z_ScreenManager();
+    screenManager = new Z_ScreenManager(renderer);
 }
 
 // Release all reosources.
@@ -69,7 +69,7 @@ void Z_UpdateGame(void) {
 }
 
 void Z_Render(void) {
-    screenManager->GetCurrentScreen()->Render(renderer);
+    screenManager->GetCurrentScreen()->Render();
     SDL_RenderPresent(renderer);
 }
 

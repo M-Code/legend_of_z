@@ -5,9 +5,11 @@
 #include "z_screen.h"
 
 class Z_MainMenuScreen : public Z_Screen {
+    private:
+        SDL_Texture* backgroundTex;
     public:
-        void Render(SDL_Renderer* renderer);
-
+        Z_MainMenuScreen(SDL_Renderer* renderer);
+        void Render();
 };
 
 #endif

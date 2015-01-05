@@ -6,10 +6,11 @@
 
 class Z_Screen {
     protected:
+        SDL_Renderer*    renderer;
         Z_TextureLoader* texLoader;
     public:
-        Z_Screen(void);
-        virtual void Render(SDL_Renderer* renderer) = 0;
-};
+        Z_Screen(SDL_Renderer* renderer);
+        virtual void Render() = 0;
+}; 
 
 #endif
