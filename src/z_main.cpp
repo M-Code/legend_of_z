@@ -16,13 +16,12 @@ All Legend of Z class names have a "Z_" prefix.
 #include <SDL2/SDL.h>
 #include "z_resource.h"
 #include "z_sdl_texture_loader.h"
-
 #include "z_screen_manager.h"
 /* End of Includes */
 
 /* Global Variables */
-Z_ScreenManager* screenManager;
 bool running;
+Z_ScreenManager* screenManager;
 
 Z_SDLTextureLoader* texLoader;
 SDL_Texture*        backgroundTex;
@@ -33,17 +32,35 @@ SDL_Surface* backgroundSurface = NULL;
 
 /* Function Prototypes */
 void Z_Init(void);
+void Z_Destroy(void);
 void Z_UpdateGame(void);
 void Z_RenderScreen(void);
 /* End of Function Prototypes */
 
-// Initialize Legend of Z resources.
+// Initialize Legend of Z.
 void Z_Init(void) {
+    SDL_Init(SDL_INIT_EVERYTHING);
+    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Creating main window..");
+
+    SDL_Window* mainWindow = SDL_CreateWindow("Legend of Z", 
+                                                SDL_WINDOWPOS_CENTERED,
+                                                SDL_WINDOWPOS_CENTERED, 
+                                                640, 480, 
+                                                SDL_WINDOW_FULLSCREEN);
+
+    renderer = SDL_CreateRenderer(mainWindow, -1, SDL_RENDERER_ACCELERATED);
+    
     running = true;
     texLoader = new Z_SDLTextureLoader();
     backgroundTex = texLoader->LoadTexture(renderer,  Z_MAIN_BACKGROUND);
     
     screenManager = new Z_ScreenManager();
+}
+
+// Release all reosources.
+void Z_Destroy(void) {
+    SDL_DestroyWindow(mainWindow);
+    SDL_Quit();
 }
 
 // Update game state.
@@ -57,20 +74,8 @@ void Z_RenderScreen(void) {
 }
 
 int main(void) {
-    SDL_Init(SDL_INIT_EVERYTHING);
-
-    SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Creating main window..");
-
-    SDL_Window* mainWindow = SDL_CreateWindow("Legend of Z", 
-                                                SDL_WINDOWPOS_CENTERED,
-                                                SDL_WINDOWPOS_CENTERED, 
-                                                640, 480, 
-                                                SDL_WINDOW_FULLSCREEN);
-
-    renderer = SDL_CreateRenderer(mainWindow, -1, SDL_RENDERER_ACCELERATED);
-    
-    SDL_Event event;
     Z_Init();
+    SDL_Event event;
     while (running) {
         if (SDL_PollEvent(&event)) {
             switch (event.type) {
@@ -90,8 +95,6 @@ int main(void) {
         Z_RenderScreen();
     }
 
-    SDL_DestroyWindow(mainWindow);
-    SDL_Quit();
-    
+    Z_Destroy();   
     return 0;
 }
