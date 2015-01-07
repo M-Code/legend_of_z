@@ -19,8 +19,11 @@ Class declaration starts with public then protected, then private.
 /* Includes */
 #include <SDL2/SDL.h>
 #include <SDL2_ttf/SDL_ttf.h>
-
+#include <string>
+#include <sstream>
+#include "z_util.h"
 #include "z_resource.h"
+#include "z_resource_loader.h"
 #include "z_screen_manager.h"
 /* End of Includes */
 
@@ -33,14 +36,19 @@ SDL_Renderer*     renderer;
 
 SDL_Surface*      backgroundSurface = NULL;
 
+TTF_Font* fpsInfoFont;
+SDL_Color fpsInfoFontColor; 
 long framesRendered;
+std::string fpsInfoStr;
+std::ostringstream ss;
 /* End of Global Variables */
 
 /* Function Prototypes */
 void Z_Init(void);
 void Z_Destroy(void);
 void Z_UpdateGame(void);
-void Z_Render(void);
+void Z_RenderGame(void);
+void Z_RenderFPSInfo(void);
 /* End of Function Prototypes */
 
 // Initialize Legend of Z.
@@ -53,14 +61,17 @@ void Z_Init(void) {
                                   SDL_WINDOWPOS_CENTERED,
                                   SDL_WINDOWPOS_CENTERED, 
                                   1024, 768, 
-                                  SDL_WINDOW_FULLSCREEN );
+                                  SDL_WINDOW_FULLSCREEN & 0);
 
     renderer = SDL_CreateRenderer(mainWindow, -1, SDL_RENDERER_ACCELERATED);
     
     running = true;
     screenManager = new Z_ScreenManager(renderer);
 
+    fpsInfoFont = Z_ResourceLoader::Z_GetInstance()->LoadTTFFont(Z_FPS_INFO_FONT_TYPE, Z_FPS_INFO_FONT_SIZE);
+    fpsInfoFontColor = Z_FPS_INFO_FONT_COLOR;
     framesRendered = 0;
+    fpsInfoStr = "blah";
 }
 
 // Release all reosources.
@@ -76,13 +87,20 @@ void Z_UpdateGame(void) {
 
 void Z_RenderGame(void) {
     screenManager->GetCurrentScreen()->Render();
+    
+    Z_RenderFPSInfo();
     SDL_RenderPresent(renderer);
 
     framesRendered++;
 }
 
 void Z_RenderFPSInfo(void) {
+    ss.clear();
+    ss.str("");
+    ss << (framesRendered * 1000 / SDL_GetTicks() );
+    Z_RenderNewTextAt(0, 0, ss.str().c_str(), fpsInfoFont, fpsInfoFontColor, renderer);
 }
+
 
 int main(void) {
     Z_Init();
@@ -102,11 +120,10 @@ int main(void) {
             }
         }
 
-        SDL_Delay(10);
+        SDL_Delay(15);
 
         Z_UpdateGame();
         Z_RenderGame();
-        Z_RenderFPSInfo();
     }
 
     Z_Destroy();   

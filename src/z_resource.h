@@ -13,4 +13,8 @@
 #define Z_TITLE_FONT_COLOR (SDL_Color) { 200, 100, 130 }
 #define Z_TITLE_STRING "Legend of Z"
 
+#define Z_FPS_INFO_FONT_TYPE "../data/fonts/ostrich-light.ttf"
+#define Z_FPS_INFO_FONT_SIZE 30
+#define Z_FPS_INFO_FONT_COLOR (SDL_Color) { 240, 20, 40 }
+#
 #endif
