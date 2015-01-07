@@ -2,5 +2,4 @@
 
 Z_Screen::Z_Screen(SDL_Renderer* renderer) {
     this->renderer = renderer;
-    texLoader = new Z_TextureLoader();
 }
