@@ -6,5 +6,5 @@ if [ `uname` == "Linux" ]; then
 elif [ `uname` == "Darwin" ]; then
     g++ -g "$DIR/src/"*.cpp -framework SDL2 -framework SDL2_ttf -o "$DIR/bin/legend_of_z"
 else
-    echo "Unrecognized OS: `uname`!"
+    echo "Unrecognized OS: `uname`!!"
 fi
