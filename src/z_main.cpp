@@ -33,12 +33,14 @@ Z_ScreenManager*  screenManager;
 
 SDL_Renderer*     renderer;
 
-SDL_Surface*      backgroundSurface = NULL;
+SDL_Surface*      backgroundSurfaceL;
 
 TTF_Font* fpsInfoFont;
 SDL_Color fpsInfoFontColor; 
+
+int targetFps;
 long framesRendered;
-std::string fpsInfoStr;
+SDL_DisplayMode currentDisplayMode;
 std::ostringstream ss;
 /* End of Global Variables */
 
@@ -70,7 +72,9 @@ void Z_Init(void) {
     fpsInfoFont = Z_ResourceLoader::Z_GetInstance()->LoadTTFFont(Z_FPS_INFO_FONT_TYPE, Z_FPS_INFO_FONT_SIZE);
     fpsInfoFontColor = Z_FPS_INFO_FONT_COLOR;
     framesRendered = 0;
-    fpsInfoStr = "blah";
+
+    SDL_GetCurrentDisplayMode(0, &currentDisplayMode);
+    targetFps = 60;
 }
 
 // Release all reosources.
@@ -96,7 +100,7 @@ void Z_RenderGame(void) {
 void Z_RenderFPSInfo(void) {
     ss.clear();
     ss.str("");
-    ss << (framesRendered * 1000 / SDL_GetTicks() );
+    ss << (framesRendered * 1000 / SDL_GetTicks() ) << " : " << currentDisplayMode.refresh_rate;
     Z_RenderNewTextAt(0, 0, ss.str().c_str(), fpsInfoFont, fpsInfoFontColor, renderer);
 }
 
@@ -119,7 +123,7 @@ int main(void) {
             }
         }
 
-        SDL_Delay(15);
+        SDL_Delay(5);
 
         Z_UpdateGame();
         Z_RenderGame();
