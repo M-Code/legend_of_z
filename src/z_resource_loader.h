@@ -1,8 +1,7 @@
 #ifndef Z_SDL_RESOURCE_LOADER_H
 #define Z_SDL_RESOURCE_LOADER_H
 
-#include <SDL2/SDL.h>
-#include <SDL2_ttf/SDL_ttf.h>
+#include "z_sdl.h"
 
 class Z_ResourceLoader {
     public:

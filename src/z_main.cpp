@@ -17,8 +17,7 @@ Class declaration starts with public then protected, then private.
 */
 
 /* Includes */
-#include <SDL2/SDL.h>
-#include <SDL2_ttf/SDL_ttf.h>
+#include "z_sdl.h"
 #include <string>
 #include <sstream>
 #include "z_util.h"

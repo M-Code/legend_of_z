@@ -1,7 +1,7 @@
 #ifndef Z_UTIL_H
 #define Z_UTIL_H
-#include <SDL2/SDL.h>
-#include <SDL2_ttf/SDL_ttf.h>
+
+#include "z_sdl.h"
 
 /*
  Render a new text at a specific location to the size of the font.
