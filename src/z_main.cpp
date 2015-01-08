@@ -74,7 +74,13 @@ void Z_Init(void) {
     framesRendered = 0;
 
     SDL_GetCurrentDisplayMode(0, &currentDisplayMode);
-    targetFps = currentDisplayMode.refresh_rate == 0? 60 : currentDisplayMode.refresh_rate;
+
+    if ( currentDisplayMode.refresh_rate == 0 ) {
+        SDL_LogWarn(SDL_LOG_CATEGORY_VIDEO, "Cannot get monitor refresh rate! Defaulting to 60!");
+        targetFps = 60;
+    } else {
+        targetFps = currentDisplayMode.refresh_rate;
+    }
 }
 
 // Release all reosources.
