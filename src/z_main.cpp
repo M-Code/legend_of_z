@@ -74,7 +74,7 @@ void Z_Init(void) {
     framesRendered = 0;
 
     SDL_GetCurrentDisplayMode(0, &currentDisplayMode);
-    targetFps = 60;
+    targetFps = currentDisplayMode.refresh_rate == 0? 60 : currentDisplayMode.refresh_rate;
 }
 
 // Release all reosources.
@@ -100,10 +100,9 @@ void Z_RenderGame(void) {
 void Z_RenderFPSInfo(void) {
     ss.clear();
     ss.str("");
-    ss << (framesRendered * 1000 / SDL_GetTicks() ) << " : " << currentDisplayMode.refresh_rate;
+    ss << (framesRendered * 1000 / SDL_GetTicks() ) << " Target: " << targetFps;
     Z_RenderNewTextAt(0, 0, ss.str().c_str(), fpsInfoFont, fpsInfoFontColor, renderer);
 }
-
 
 int main(void) {
     Z_Init();
