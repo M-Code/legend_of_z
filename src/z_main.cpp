@@ -91,7 +91,9 @@ void Z_Init(void) {
 
     // Testing how fast can we actually render! 
     //targetFps = 3000;
-
+    SDL_Joystick* joystick;
+    SDL_JoystickEventState(SDL_ENABLE);
+    joystick = SDL_JoystickOpen(0);
 }
 
 // Release all reosources.
@@ -131,19 +133,21 @@ int main(void) {
     while (running) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-                    case SDL_JOYAXISMOTION:  /* Handle Joystick Motion */
-                        if ( ( event.jaxis.value < -3200 ) || (event.jaxis.value > 3200 ) ) {
-                            running = false;
+                case SDL_JOYAXISMOTION:  /* Handle Joystick Motion */
+                    if ( ( event.jaxis.value < -3200 ) || (event.jaxis.value > 3200 ) ) {
+                        running = false;
+                        if( event.jaxis.axis == 0) {
+                            /* Left-right movement code goes here */
+                        } 
                             
-                            if( event.jaxis.axis == 0) {
-                                /* Left-right movement code goes here */
-                            } 
-                            
-                            if( event.jaxis.axis == 1) {
-                                /* Up-Down movement code goes here */
-                            } 
-                        }
-                        break;
+                        if( event.jaxis.axis == 1) {
+                            /* Up-Down movement code goes here */
+                        } 
+                    }
+                    break;
+                case SDL_JOYBUTTONDOWN:
+                    running = false;
+                    break;
                 case SDL_KEYDOWN: {
                     const Uint8 *state = SDL_GetKeyboardState(NULL);
                     if (state[SDL_SCANCODE_RETURN]) {
@@ -178,7 +182,6 @@ int main(void) {
             actualFps = frameCounter;
             frameCounter = 0;
         }
-
 
         ticksPerFrame = (1000 - (lastTicks -lastSecond)) / (targetFps - frameCounter) ;
     }
