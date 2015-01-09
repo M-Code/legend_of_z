@@ -9,6 +9,7 @@ This is an attempt to create a Legend of Zelda clone.
 Function without parameters should explicitly have a "void" parameter type.
 
 All Legend of Z functions have a "Z_" prefix.
+Class methods does not need to have "Z_" prefix.
 All Legend of Z source files have a "z_" prefix.
 All Legend of Z class names have a "Z_" prefix.
 
@@ -47,8 +48,8 @@ static Uint32 lastSecond; // Counter FPS every second.
 static Uint32 actualFps;
 static Uint32 frameCounter;
 
-SDL_DisplayMode currentDisplayMode;
-std::ostringstream ss;
+static SDL_DisplayMode currentDisplayMode;
+static std::ostringstream ss;
 /* End of Global Variables */
 
 /* Function Prototypes */
@@ -76,7 +77,7 @@ void Z_Init(void) {
     running = true;
     screenManager = new Z_ScreenManager(renderer);
 
-    fpsInfoFont = Z_ResourceLoader::Z_GetInstance()->LoadTTFFont(Z_FPS_INFO_FONT_TYPE, Z_FPS_INFO_FONT_SIZE);
+    fpsInfoFont = Z_ResourceLoader::GetInstance()->LoadTTFFont(Z_FPS_INFO_FONT_TYPE, Z_FPS_INFO_FONT_SIZE);
     fpsInfoFontColor = Z_FPS_INFO_FONT_COLOR;
 
     SDL_GetCurrentDisplayMode(0, &currentDisplayMode);
@@ -130,6 +131,19 @@ int main(void) {
     while (running) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
+                    case SDL_JOYAXISMOTION:  /* Handle Joystick Motion */
+                        if ( ( event.jaxis.value < -3200 ) || (event.jaxis.value > 3200 ) ) {
+                            running = false;
+                            
+                            if( event.jaxis.axis == 0) {
+                                /* Left-right movement code goes here */
+                            } 
+                            
+                            if( event.jaxis.axis == 1) {
+                                /* Up-Down movement code goes here */
+                            } 
+                        }
+                        break;
                 case SDL_KEYDOWN: {
                     const Uint8 *state = SDL_GetKeyboardState(NULL);
                     if (state[SDL_SCANCODE_RETURN]) {
