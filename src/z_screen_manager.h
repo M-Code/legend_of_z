@@ -10,14 +10,16 @@ class Z_ScreenManager {
 
         Z_Screen* mainMenuScreen;
         Z_Screen* loadGameScreen;
-        Z_Screen* saveGameScreen;
         Z_Screen* aboutScreen;
         Z_Screen* gameScreen;
         
     public:
         Z_ScreenManager(SDL_Renderer* renderer);
         Z_Screen* GetCurrentScreen(void);
-        void SetCurrentScreen(void);
+        void SetMainMenuScreen(void);
+        void SetLoadGameScreen(void);
+        void SetAboutScreen(void);
+        void SetGameScreen(void);
 };
 
 #endif

@@ -64,6 +64,9 @@ void Z_RenderFPSInfo(void);
 void Z_Init(void) {
     SDL_Init(SDL_INIT_EVERYTHING);
     TTF_Init();
+    SDL_Joystick* joystick;
+    SDL_JoystickEventState(SDL_ENABLE);
+    joystick = SDL_JoystickOpen(0);
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Creating main window..");
 
     mainWindow = SDL_CreateWindow("Legend of Z",
@@ -91,9 +94,6 @@ void Z_Init(void) {
 
     // Testing how fast can we actually render! 
     //targetFps = 3000;
-    SDL_Joystick* joystick;
-    SDL_JoystickEventState(SDL_ENABLE);
-    joystick = SDL_JoystickOpen(0);
 }
 
 // Release all reosources.
@@ -133,9 +133,10 @@ int main(void) {
     while (running) {
         while (SDL_PollEvent(&event)) {
             switch (event.type) {
-                case SDL_JOYAXISMOTION:  /* Handle Joystick Motion */
+                case SDL_JOYAXISMOTION: {  /* Handle Joystick Motion */
                     if ( ( event.jaxis.value < -3200 ) || (event.jaxis.value > 3200 ) ) {
-                        running = false;
+                        screenManager->SetMainMenuScreen();
+                        
                         if( event.jaxis.axis == 0) {
                             /* Left-right movement code goes here */
                         } 
@@ -144,16 +145,19 @@ int main(void) {
                             /* Up-Down movement code goes here */
                         } 
                     }
-                    break;
-                case SDL_JOYBUTTONDOWN:
-                    running = false;
-                    break;
+                } break;
+
+                case SDL_JOYBUTTONDOWN: {
+                    screenManager->SetGameScreen();
+                } break;
+
                 case SDL_KEYDOWN: {
                     const Uint8 *state = SDL_GetKeyboardState(NULL);
                     if (state[SDL_SCANCODE_RETURN]) {
                         running = false;
                     }
                 } break;
+
                 case SDL_QUIT: {
                     running = false;
                 } break;
@@ -175,16 +179,17 @@ int main(void) {
 
         Z_RenderGame();
 
-
+        /** Frame rate regulation **/
         lastTicks = SDL_GetTicks(); // Start Timing right after rendering.
         if ( lastTicks - lastSecond >= 1000 ) {
             lastSecond = lastTicks;
             actualFps = frameCounter;
-            frameCounter = 0;
+            frameCounter = 0; // Start counting frames in this second.
         }
 
+        // recalculate ticks per frame based on milleseconds and frames left to render in this second.
         ticksPerFrame = (1000 - (lastTicks -lastSecond)) / (targetFps - frameCounter) ;
-    }
+    } // End of game loop.
 
     Z_Destroy();   
     return 0;
