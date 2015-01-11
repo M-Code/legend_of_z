@@ -8,6 +8,7 @@ typedef struct {
 //static Z_Event eq;
 
 void Z_PushEvent( Z_Event* event );
+
 bool Z_PollEvent( Z_Event* event );
 
 

@@ -152,7 +152,7 @@ int main(void) {
             }
         }
 
-        while ( Z_PollEvent( &zEvent ) ) {
+        while ( Z_PollEvent( NULL ) ) {
         }
 
         Z_UpdateGame();
