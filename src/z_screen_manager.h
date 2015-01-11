@@ -3,6 +3,7 @@
 
 #include "SDL2/SDL.h"
 #include "z_screen.h"
+#include "z_joystick_manager.h"
 
 class Z_ScreenManager {
     private:
@@ -14,7 +15,7 @@ class Z_ScreenManager {
         Z_Screen* gameScreen;
         
     public:
-        Z_ScreenManager(SDL_Renderer* renderer);
+        Z_ScreenManager(SDL_Renderer* renderer, Z_JoystickManager* joystickManager);
         Z_Screen* GetCurrentScreen(void);
         void SetMainMenuScreen(void);
         void SetLoadGameScreen(void);

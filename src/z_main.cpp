@@ -21,6 +21,9 @@ Class declaration starts with public then protected, then private.
 #include "z_sdl.h"
 #include <string>
 #include <sstream>
+
+#include "z_event_queue.h"
+#include "z_joystick_manager.h"
 #include "z_util.h"
 #include "z_resource.h"
 #include "z_resource_loader.h"
@@ -29,12 +32,12 @@ Class declaration starts with public then protected, then private.
 
 /* Global Variables */
 static bool running;
-static SDL_Window*       mainWindow;
-static Z_ScreenManager*  screenManager;
+static SDL_Window*        mainWindow;
+static Z_ScreenManager*   screenManager;
+static Z_JoystickManager* joystickManager;
+static SDL_Renderer*      renderer;
 
-static SDL_Renderer*     renderer;
-
-static SDL_Surface*      backgroundSurfaceL;
+static SDL_Surface*       backgroundSurfaceL;
 
 static TTF_Font* fpsInfoFont;
 static SDL_Color fpsInfoFontColor; 
@@ -64,9 +67,7 @@ void Z_RenderFPSInfo(void);
 void Z_Init(void) {
     SDL_Init(SDL_INIT_EVERYTHING);
     TTF_Init();
-    SDL_Joystick* joystick;
     SDL_JoystickEventState(SDL_ENABLE);
-    joystick = SDL_JoystickOpen(0);
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Creating main window..");
 
     mainWindow = SDL_CreateWindow("Legend of Z",
@@ -78,22 +79,20 @@ void Z_Init(void) {
     renderer = SDL_CreateRenderer(mainWindow, -1, SDL_RENDERER_ACCELERATED);
     
     running = true;
-    screenManager = new Z_ScreenManager(renderer);
-
-    fpsInfoFont = Z_ResourceLoader::GetInstance()->LoadTTFFont(Z_FPS_INFO_FONT_TYPE, Z_FPS_INFO_FONT_SIZE);
+    joystickManager = new Z_JoystickManager();
+    screenManager = new Z_ScreenManager(renderer, joystickManager);
+    
+    fpsInfoFont      = Z_ResourceLoader::GetInstance()->LoadTTFFont( Z_FPS_INFO_FONT_TYPE, Z_FPS_INFO_FONT_SIZE );
     fpsInfoFontColor = Z_FPS_INFO_FONT_COLOR;
 
-    SDL_GetCurrentDisplayMode(0, &currentDisplayMode);
+    SDL_GetCurrentDisplayMode( 0, &currentDisplayMode );
 
     if ( currentDisplayMode.refresh_rate == 0 ) {
-        SDL_LogWarn(SDL_LOG_CATEGORY_VIDEO, "Cannot get monitor refresh rate! Defaulting to 60!");
+        SDL_LogWarn( SDL_LOG_CATEGORY_VIDEO, "Cannot get monitor refresh rate! Defaulting to 60!" );
         targetFps = 60;
     } else {
         targetFps = currentDisplayMode.refresh_rate;
     }
-
-    // Testing how fast can we actually render! 
-    //targetFps = 3000;
 }
 
 // Release all reosources.
@@ -105,13 +104,14 @@ void Z_Destroy(void) {
 
 // Update game state.
 void Z_UpdateGame(void) {
+    screenManager->GetCurrentScreen()->Update();
 }
 
 void Z_RenderGame(void) {
     screenManager->GetCurrentScreen()->Render();
     
     Z_RenderFPSInfo();
-    SDL_RenderPresent(renderer);
+    SDL_RenderPresent( renderer );
 
     framesRendered++;
     frameCounter++;
@@ -121,39 +121,26 @@ void Z_RenderFPSInfo(void) {
     ss.clear();
     ss.str("");
 
-    ss << "Average FPS: " << (framesRendered * 1000 / (SDL_GetTicks() - gameReadyTime) ) << " Target FPS: " << targetFps << " Actual FPS: " << actualFps;
+    ss << "Average FPS: " << ( framesRendered * 1000 / (SDL_GetTicks() - gameReadyTime) ) << " Target FPS: " << targetFps << " Actual FPS: " << actualFps;
 
-    Z_RenderNewTextAt(0, 0, ss.str().c_str(), fpsInfoFont, fpsInfoFontColor, renderer);
+    Z_RenderNewTextAt( 0, 0, ss.str().c_str(), fpsInfoFont, fpsInfoFontColor, renderer );
 }
 
 int main(void) {
     Z_Init();
-    SDL_Event event;
+    SDL_Event sdlEvent;
+    Z_Event   zEvent;
 
-    while (running) {
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_JOYAXISMOTION: {  /* Handle Joystick Motion */
-                    if ( ( event.jaxis.value < -3200 ) || (event.jaxis.value > 3200 ) ) {
-                        screenManager->SetMainMenuScreen();
-                        
-                        if( event.jaxis.axis == 0) {
-                            /* Left-right movement code goes here */
-                        } 
-                            
-                        if( event.jaxis.axis == 1) {
-                            /* Up-Down movement code goes here */
-                        } 
-                    }
-                } break;
+    while ( running ) {
+        while ( SDL_PollEvent( &sdlEvent ) ) {
+            
+            joystickManager->ProcessSDLEvent( &sdlEvent );
 
-                case SDL_JOYBUTTONDOWN: {
-                    screenManager->SetGameScreen();
-                } break;
+            switch (sdlEvent.type) {
 
                 case SDL_KEYDOWN: {
-                    const Uint8 *state = SDL_GetKeyboardState(NULL);
-                    if (state[SDL_SCANCODE_RETURN]) {
+                    const Uint8 *state = SDL_GetKeyboardState( NULL );
+                    if ( state[ SDL_SCANCODE_RETURN ] ) {
                         running = false;
                     }
                 } break;
@@ -161,7 +148,11 @@ int main(void) {
                 case SDL_QUIT: {
                     running = false;
                 } break;
+
             }
+        }
+
+        while ( Z_PollEvent( &zEvent ) ) {
         }
 
         Z_UpdateGame();
@@ -188,7 +179,7 @@ int main(void) {
         }
 
         // recalculate ticks per frame based on milleseconds and frames left to render in this second.
-        ticksPerFrame = (1000 - (lastTicks -lastSecond)) / (targetFps - frameCounter) ;
+        ticksPerFrame = (1000 - ( lastTicks -lastSecond ) ) / ( targetFps - frameCounter ) ;
     } // End of game loop.
 
     Z_Destroy();   
