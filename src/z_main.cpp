@@ -15,6 +15,10 @@ All Legend of Z class names have a "Z_" prefix.
 
 Class declaration starts with public then protected, then private.
 
+TODO list:
+    Add Z_Event queue.
+    
+
 */
 
 /* Includes */
@@ -152,14 +156,19 @@ int main(void) {
             }
         }
 
-        while ( Z_PollEvent( NULL ) ) {
+        while ( Z_PollEvent( &zEvent ) ) {
+            switch ( zEvent.type ) {
+                case Z_ScreenChange:
+                    screenManager->SetCurrentScreen(zEvent.screenChange.toScreen);
+                break;
+            }
         }
 
         Z_UpdateGame();
 
         if ( lastTicks != 0 ) {
             Uint32 ticksGone = SDL_GetTicks() - lastTicks;
-            if(ticksGone < ticksPerFrame) {
+            if( ticksGone < ticksPerFrame ) {
                 SDL_Delay(ticksPerFrame - ticksGone);
             }
         } else {
@@ -171,7 +180,7 @@ int main(void) {
         Z_RenderGame();
 
         /** Frame rate regulation **/
-        lastTicks = SDL_GetTicks(); // Start Timing right after rendering.
+        lastTicks = SDL_GetTicks(); // Start timing right after rendering.
         if ( lastTicks - lastSecond >= 1000 ) {
             lastSecond = lastTicks;
             actualFps = frameCounter;

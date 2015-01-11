@@ -13,16 +13,18 @@ Z_Screen* Z_ScreenManager::GetCurrentScreen(void) {
     return currentScreen;
 }
 
-void Z_ScreenManager::SetMainMenuScreen(void) {
-    currentScreen = mainMenuScreen;
-}
-void Z_ScreenManager::SetLoadGameScreen(void) {
-    currentScreen = loadGameScreen;
-}
-void Z_ScreenManager::SetAboutScreen(void) {
-    currentScreen = aboutScreen;
-}
-void Z_ScreenManager::SetGameScreen(void) {
-    currentScreen = gameScreen;
-}
+void Z_ScreenManager::SetCurrentScreen( Z_ScreenType type ) {
+    switch ( type ) {
+        case Z_MainMenu:
+            currentScreen = mainMenuScreen;
+            break;
+        case Z_Game:
+            currentScreen = gameScreen;
+            break;
+        case Z_About:
+            break;
+        case Z_LoadGame:
+            break;
+    }
 
+}
