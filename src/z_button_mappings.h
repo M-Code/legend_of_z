@@ -2,8 +2,8 @@
 #define Z_BUTTON_MAPPINGS_H
 
 #define Z_BUTTON_Y  2
-#define Z_BUTTON_X  1
-#define Z_BUTTON_B  0
+#define Z_BUTTON_X  0
+#define Z_BUTTON_B  1
 #define Z_BUTTON_A  3
 #define Z_BUTTON_L1  4
 #define Z_BUTTON_R1  5

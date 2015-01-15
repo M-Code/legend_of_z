@@ -15,3 +15,11 @@ bool Z_JoystickManager::IsPressed( Uint32 button ) {
     return SDL_JoystickGetButton( joystick, button );
 }
 
+bool Z_JoystickManager::IsUp( void ) {
+    Sint16 val = SDL_JoystickGetAxis( joystick, 1 );
+    return val < -30000;
+}
+
+bool Z_JoystickManager::IsDown( void ) {
+    return SDL_JoystickGetAxis( joystick, 1 ) > 30000;
+}

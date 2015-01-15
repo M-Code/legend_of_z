@@ -16,10 +16,16 @@ All Legend of Z class names have a "Z_" prefix.
 Class declaration starts with public then protected, then private.
 
 TODO list:
-    Add Z_Event queue.
-    
-
+   Add selectable menu items.
+   Plug & Play Joystick.
+   Implement all Joystick buttons.
+   Add Music.
 */
+
+/* Define Options */
+#define SHOW_FPS_INFO 1
+#define FULL_SCREEN 0
+/* End of Define Options */
 
 /* Includes */
 #include "z_sdl.h"
@@ -35,7 +41,7 @@ TODO list:
 /* End of Includes */
 
 /* Global Variables */
-static bool running;
+static bool               running;
 static SDL_Window*        mainWindow;
 static Z_ScreenManager*   screenManager;
 static Z_JoystickManager* joystickManager;
@@ -60,31 +66,31 @@ static std::ostringstream ss;
 /* End of Global Variables */
 
 /* Function Prototypes */
-void Z_Init(void);
-void Z_Destroy(void);
-void Z_UpdateGame(void);
-void Z_RenderGame(void);
-void Z_RenderFPSInfo(void);
+void Z_Init( void );
+void Z_Destroy( void );
+void Z_UpdateGame( void );
+void Z_RenderGame( void );
+void Z_RenderFPSInfo( void );
 /* End of Function Prototypes */
 
 // Initialize Legend of Z.
-void Z_Init(void) {
-    SDL_Init(SDL_INIT_EVERYTHING);
+void Z_Init( void ) {
+    SDL_Init( SDL_INIT_EVERYTHING );
     TTF_Init();
-    SDL_JoystickEventState(SDL_ENABLE);
+    SDL_JoystickEventState( SDL_ENABLE );
     SDL_LogInfo(SDL_LOG_CATEGORY_APPLICATION, "Creating main window..");
 
     mainWindow = SDL_CreateWindow("Legend of Z",
                                   SDL_WINDOWPOS_CENTERED,
                                   SDL_WINDOWPOS_CENTERED, 
                                   1024, 768, 
-                                  SDL_WINDOW_FULLSCREEN & 0);
+                                  FULL_SCREEN ? SDL_WINDOW_FULLSCREEN : 0);
 
     renderer = SDL_CreateRenderer(mainWindow, -1, SDL_RENDERER_ACCELERATED);
     
     running = true;
     joystickManager = new Z_JoystickManager();
-    screenManager = new Z_ScreenManager(renderer, joystickManager);
+    screenManager   = new Z_ScreenManager( renderer, joystickManager );
     
     fpsInfoFont      = Z_ResourceLoader::GetInstance()->LoadTTFFont( Z_FPS_INFO_FONT_TYPE, Z_FPS_INFO_FONT_SIZE );
     fpsInfoFontColor = Z_FPS_INFO_FONT_COLOR;
@@ -100,37 +106,38 @@ void Z_Init(void) {
 }
 
 // Release all reosources.
-void Z_Destroy(void) {
-    SDL_DestroyWindow(mainWindow);
+void Z_Destroy( void ) {
+    SDL_DestroyWindow( mainWindow );
     SDL_Quit();
     TTF_Quit();
 }
 
 // Update game state.
-void Z_UpdateGame(void) {
+void Z_UpdateGame( void ) {
     screenManager->GetCurrentScreen()->Update();
 }
 
-void Z_RenderGame(void) {
+void Z_RenderGame( void ) {
     screenManager->GetCurrentScreen()->Render();
-    
-    Z_RenderFPSInfo();
+
+    if ( SHOW_FPS_INFO ) {
+        Z_RenderFPSInfo();
+    }
     SDL_RenderPresent( renderer );
 
     framesRendered++;
     frameCounter++;
 }
 
-void Z_RenderFPSInfo(void) {
+void Z_RenderFPSInfo( void ) {
     ss.clear();
-    ss.str("");
+    ss.str( "" );
 
     ss << "Average FPS: " << ( framesRendered * 1000 / (SDL_GetTicks() - gameReadyTime) ) << " Target FPS: " << targetFps << " Actual FPS: " << actualFps;
-
     Z_RenderNewTextAt( 0, 0, ss.str().c_str(), fpsInfoFont, fpsInfoFontColor, renderer );
 }
 
-int main(void) {
+int main( void ) {
     Z_Init();
     SDL_Event sdlEvent;
     Z_Event   zEvent;
@@ -159,7 +166,7 @@ int main(void) {
         while ( Z_PollEvent( &zEvent ) ) {
             switch ( zEvent.type ) {
                 case Z_ScreenChange:
-                    screenManager->SetCurrentScreen(zEvent.screenChange.toScreen);
+                    screenManager->SetCurrentScreen( zEvent.screenChange.toScreen );
                 break;
             }
         }
@@ -169,7 +176,7 @@ int main(void) {
         if ( lastTicks != 0 ) {
             Uint32 ticksGone = SDL_GetTicks() - lastTicks;
             if( ticksGone < ticksPerFrame ) {
-                SDL_Delay(ticksPerFrame - ticksGone);
+                SDL_Delay( ticksPerFrame - ticksGone );
             }
         } else {
             // Initialize our metrics.
@@ -186,9 +193,9 @@ int main(void) {
             actualFps = frameCounter;
             frameCounter = 0; // Start counting frames in this second.
         }
-
+        
         // recalculate ticks per frame based on milleseconds and frames left to render in this second.
-        ticksPerFrame = (1000 - ( lastTicks -lastSecond ) ) / ( targetFps - frameCounter ) ;
+        ticksPerFrame = (1000 - ( lastTicks -lastSecond ) ) / ( targetFps - frameCounter );
     } // End of game loop.
 
     Z_Destroy();   
